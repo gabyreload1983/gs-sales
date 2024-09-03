@@ -7,13 +7,16 @@ import {
   Param,
   Delete,
   Query,
+  Ip,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Prisma } from '@prisma/client';
+import { MyLoggerService } from 'src/my-logger/my-logger.service';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+  private readonly logger = new MyLoggerService(UsersController.name);
 
   @Post()
   create(@Body() createUserDto: Prisma.UserCreateInput) {
@@ -21,7 +24,8 @@ export class UsersController {
   }
 
   @Get()
-  findAll(@Query('role') role?: 'USER' | 'ADMIN') {
+  findAll(@Ip() ip: string, @Query('role') role?: 'USER' | 'ADMIN') {
+    this.logger.log(`Request for ALL Users\t${ip}`, UsersController.name);
     return this.usersService.findAll(role);
   }
 
